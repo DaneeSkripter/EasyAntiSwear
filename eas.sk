@@ -1,0 +1,55 @@
+options:
+    prefix: &7[&a&lEasy&c&lAnti&7&lSwear&7]
+    version: "1.0.0" # Don't change this
+
+on load:
+    send "{@prefix} &rEnabling &a&lEasy&c&lAnti&7&lSwear&r v%{@version}%"
+    set {_latestversion} to text from "https://version.daneeskripter.dev/eas/version.txt"
+    if {_latestversion} is {@version}:
+        send "{@prefix} &rYou are using the latest version"
+    else:   
+        send "{@prefix} &cPlease update EasyAntiSwear Skript"
+        send "&rLatest version: %{_latestversion}%"
+        send "&rYour version: %{@version}%"
+
+
+on unload:
+    send "{@prefix} &rDisabling &a&lEasy&c&lAnti&7&lSwear&r v%{@version}%"
+
+command /eas [<text>] [<text>]:
+    trigger: 
+        if arg-1 is not set:
+            send "&7■■■■■■■■■■■■■■■&a&lEasy&c&lAnti&7&lSwear&7■■■■■■■■■■■■■■■" to player
+            send "" to player
+            send "&6/eas add <word>&7 Add word to blacklisted words" to player
+            send "&6/eas list&7 Show list of blacklisted words" to player
+            send "&6/eas remove <word>&7 Remove word from blacklisted words" to player
+            send "" to player
+            send "&6Developed by &lDaneeSkripter"
+            send "&7■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" to player
+        else if arg-1 is "add":
+            if arg-2 is not set:
+                send "{@prefix} &cSpecify a word" to player
+            else if {blacklist_words::*} contains arg-2:
+                send "{@prefix} &cThis word is already blacklisted." to player
+            else:   
+                add arg-2 to {blacklist_words::*}
+                send "{@prefix} &7Word &6%arg-2% &7has been added to blacklisted words!" to player
+        else if arg-1 is "list":
+            send "&7■■■■■■■■■■■■■■■&a&lEasy&c&lAnti&7&lSwear&7■■■■■■■■■■■■■■■" to player
+            send "&7Blacklisted words: &c%{blacklist_words::*}%" to player
+            send "&7■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" to player
+        else if arg-1 is "remove":
+            if arg-2 is not set:
+                send "{@prefix} &cSpecify a word" to player
+            else if {blacklist_words::*} contains arg-2:
+                remove arg-2 from {blacklist_words::*}
+                send "{@prefix} &7Word &6%arg-2% &7has been removed from blacklisted words!" to player
+            else:
+                send "{@prefix} &cWord &6%arg-2%&c is not blacklisted!" to player
+
+on chat:
+    loop {blacklist_words::*}:
+        if message contains loop-value:
+            send "{@prefix} &cDon't swear here!" to player
+            cancel event
